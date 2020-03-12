@@ -1,7 +1,7 @@
 {
   "study_id": "TEST-PR",
-  "tumour_aln_analysis_id": "f64ae545-11c1-46f7-8ae5-4511c156f7be",
-  "normal_aln_analysis_id": "6785bb87-95ec-4c16-85bb-8795ec3c1650",
+  "tumour_aln_analysis_id": "8796333c-e094-406c-9633-3ce094406c5b",
+  "normal_aln_analysis_id": "80a1779d-7110-44f7-a177-9d711074f712",
   "cleanup": false,
   "song_url": "https://song.qa.argo.cancercollaboratory.org",
   "score_url": "https://score.qa.argo.cancercollaboratory.org",
