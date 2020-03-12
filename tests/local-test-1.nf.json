@@ -23,6 +23,10 @@
   "generateBas": {
     "ref_genome_fa": "reference/tiny-grch38-chr11-530001-537000.fa"
   },
+  "repackSangerResults": {
+    "cpus": 1,
+    "mem": 1
+  },
   "extractSangerCall": {
     "cpus": 1,
     "mem": 1
