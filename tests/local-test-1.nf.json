@@ -1,0 +1,38 @@
+{
+  "study_id": "TEST-PR",
+  "tumour_aln_analysis_id": "f64ae545-11c1-46f7-8ae5-4511c156f7be",
+  "normal_aln_analysis_id": "6785bb87-95ec-4c16-85bb-8795ec3c1650",
+  "cleanup": false,
+  "song_url": "https://song.qa.argo.cancercollaboratory.org",
+  "score_url": "https://score.qa.argo.cancercollaboratory.org",
+  "download": {
+    "song_url": "https://song.qa.argo.cancercollaboratory.org",
+    "song_cpus": 2,
+    "song_mem": 2,
+    "score_url": "https://score.qa.argo.cancercollaboratory.org",
+    "score_cpus": 3,
+    "score_mem": 8
+  },
+  "sangerWxsVariantCaller": {
+    "cpus": 3,
+    "mem": 2,
+    "vagrent_annot": "reference/VAGrENT_ref_GRCh38_hla_decoy_ebv_ensembl_91.tar.gz",
+    "ref_genome_tar": "reference/core_ref_GRCh38_hla_decoy_ebv.tar.gz",
+    "ref_snv_indel_tar": "reference/SNV_INDEL_ref_GRCh38_hla_decoy_ebv-fragment.tar.gz"  
+  },
+  "generateBas": {
+    "ref_genome_fa": "reference/tiny-grch38-chr11-530001-537000.fa"
+  },
+  "extractSangerCall": {
+    "cpus": 1,
+    "mem": 1
+  },
+  "payloadGenVariantCall": {
+    "cpus": 1,
+    "mem": 1
+  },
+  "uploadVariant": {
+    "cpus": 1,
+    "mem": 1
+  }
+}
