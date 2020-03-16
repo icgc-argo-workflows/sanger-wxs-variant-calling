@@ -34,7 +34,8 @@ process extractFilesFromTarball {
     val pattern
 
   output:
-    tuple path("*${pattern}{.bam,.cram,.vcf.gz}"), path("*${pattern}{.bam.bai,.cram.crai,.vcf.gz.tbi}"), emit: extracted_files
+    path "*${pattern}{.bam,.cram,.vcf.gz}", emit: output_file
+    path "*${pattern}{.bam.bai,.cram.crai,.vcf.gz.tbi}", emit: output_file_index
 
   script:
     """
