@@ -175,9 +175,9 @@ include { generateBas as basT; generateBas as basN; } from './modules/raw.github
 include sangerWxsVariantCaller as sangerWxs from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/sanger-wxs-variant-caller.3.1.6-2/tools/sanger-wxs-variant-caller/sanger-wxs-variant-caller.nf' params(sangerWxsVariantCaller_params)
 include repackSangerResults as repack from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/repack-sanger-results.0.2.0.0/tools/repack-sanger-results/repack-sanger-results' params(repackSangerResults_params)
 include { extractFilesFromTarball as extractVarSnv; extractFilesFromTarball as extractVarIndel; extractFilesFromTarball as extractQC } from './modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/extract-files-from-tarball.0.2.0.0/tools/extract-files-from-tarball/extract-files-from-tarball' params(extractSangerCall_params)
-include { payloadGenVariantCalling as pGenVarSnv } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-variant-calling.0.1.0.0/tools/payload-gen-variant-calling/payload-gen-variant-calling" params(payloadGenVariantCall_params)
+include { payloadGenVariantCalling as pGenVarSnv; payloadGenVariantCalling as pGenVarIndel } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-variant-calling.0.1.0.0/tools/payload-gen-variant-calling/payload-gen-variant-calling" params(payloadGenVariantCall_params)
 //include { payloadGenSangerQC as pGenQC } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-sanager-qc.0.1.0.0/tools/payload-gen-sanager-qc/payload-gen-sanager-qc" params(payloadGenSangerQc_params)
-include { songScoreUpload as upVarSnv; songScoreUpload as upQC} from './song-score-utils/song-score-upload' params(upload_params)
+include { songScoreUpload as upVarSnv; songScoreUpload as upVarIndel; songScoreUpload as upQC} from './song-score-utils/song-score-upload' params(upload_params)
 include cleanupWorkdir as cleanup from './modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/b45093d3ecc3cb98407549158c5315991802526b/process/cleanup-workdir'
 
 
@@ -240,9 +240,15 @@ workflow SangerWxs {
             extractVarSnv.out.extracted_files,
             name, short_name, version
         )
+        pGenVarIndel(
+            dnldT.out.song_analysis, dnldN.out.song_analysis,
+            extractVarIndel.out.extracted_files,
+            name, short_name, version
+        )
 
         // upload variant results in paralllel
         upVarSnv(study_id, pGenVarSnv.out.payload, pGenVarSnv.out.files_to_upload)
+        upVarIndel(study_id, pGenVarIndel.out.payload, pGenVarIndel.out.files_to_upload)
 
         /*  // more to flesh out
         qc_result_patterns = Channel.from(
