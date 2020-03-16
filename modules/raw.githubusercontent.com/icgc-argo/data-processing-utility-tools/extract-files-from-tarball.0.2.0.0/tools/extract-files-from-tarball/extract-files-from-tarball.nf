@@ -26,7 +26,6 @@ nextflow.preview.dsl=2
 params.tarball = ""
 params.pattern = ""
 
-
 process extractFilesFromTarball {
   container 'cfmanteiga/alpine-bash-curl-jq'
 
