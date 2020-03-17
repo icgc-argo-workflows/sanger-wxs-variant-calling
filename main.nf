@@ -2,7 +2,7 @@
 nextflow.preview.dsl = 2
 name = 'sanger-wxs-variant-calling'
 short_name = 'sanger-wxs'
-version = '0.1.0-dev'
+version = '3.1.6-2.1-dev'
 
 
 /*
@@ -236,13 +236,13 @@ workflow SangerWxs {
         extractVarIndel(repack.out.pindel, 'flagged')
 
         pGenVarSnv(
-            dnldT.out.song_analysis, dnldN.out.song_analysis,
-            extractVarSnv.out.output_file.concat(extractVarSnv.out.output_file_index),
+            dnldN.out.song_analysis, dnldT.out.song_analysis,
+            extractVarSnv.out.output_file.concat(extractVarSnv.out.output_file_index).collect(),
             name, short_name, version
         )
         pGenVarIndel(
-            dnldT.out.song_analysis, dnldN.out.song_analysis,
-            extractVarIndel.out.output_file.concat(extractVarIndel.out.output_file_index),
+            dnldN.out.song_analysis, dnldT.out.song_analysis,
+            extractVarIndel.out.output_file.concat(extractVarIndel.out.output_file_index).collect(),
             name, short_name, version
         )
 
