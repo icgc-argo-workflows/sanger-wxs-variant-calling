@@ -237,12 +237,12 @@ workflow SangerWxs {
 
         pGenVarSnv(
             dnldN.out.song_analysis, dnldT.out.song_analysis,
-            extractVarSnv.out.output_file.concat(extractVarSnv.out.output_file_index).collect(),
+            extractVarSnv.out.extracted_files,
             name, short_name, version
         )
         pGenVarIndel(
             dnldN.out.song_analysis, dnldT.out.song_analysis,
-            extractVarIndel.out.output_file.concat(extractVarIndel.out.output_file_index).collect(),
+            extractVarIndel.out.extracted_files,
             name, short_name, version
         )
 
