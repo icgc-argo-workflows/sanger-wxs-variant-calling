@@ -1,15 +1,15 @@
 {
   "study_id": "TEST-PR",
-  "tumour_aln_analysis_id": "8796333c-e094-406c-9633-3ce094406c5b",
-  "normal_aln_analysis_id": "80a1779d-7110-44f7-a177-9d711074f712",
+  "tumour_aln_analysis_id": "03905962-f1e1-41e8-9059-62f1e1c1e8fc",
+  "normal_aln_analysis_id": "9940db0f-c100-496a-80db-0fc100d96ac1",
   "cleanup": false,
-  "song_url": "https://song.qa.argo.cancercollaboratory.org",
-  "score_url": "https://score.qa.argo.cancercollaboratory.org",
+  "song_url": "https://song.rdpc-qa.cancercollaboratory.org",
+  "score_url": "https://score.rdpc-qa.cancercollaboratory.org",
   "download": {
-    "song_url": "https://song.qa.argo.cancercollaboratory.org",
+    "song_url": "https://song.rdpc-qa.cancercollaboratory.org",
     "song_cpus": 2,
     "song_mem": 2,
-    "score_url": "https://score.qa.argo.cancercollaboratory.org",
+    "score_url": "https://score.rdpc-qa.cancercollaboratory.org",
     "score_cpus": 3,
     "score_mem": 8
   },
