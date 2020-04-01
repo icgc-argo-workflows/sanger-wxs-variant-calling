@@ -147,6 +147,10 @@ repackSangerResults_params = [
     *:(params.repackSangerResults ?: [:])
 ]
 
+cavemanVcfFix_params = [
+    *:(params.cavemanVcfFix ?: [:])
+]
+
 extractSangerCall_params = [
     *:(params.extractSangerCall ?: [:])
 ]
@@ -174,6 +178,7 @@ include { songScoreDownload as dnldT; songScoreDownload as dnldN } from './song-
 include { generateBas as basT; generateBas as basN; } from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/generate-bas.0.2.0.0/tools/generate-bas/generate-bas' params(generateBas_params)
 include sangerWxsVariantCaller as sangerWxs from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/sanger-wxs-variant-caller.3.1.6-2/tools/sanger-wxs-variant-caller/sanger-wxs-variant-caller.nf' params(sangerWxsVariantCaller_params)
 include repackSangerResults as repack from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/repack-sanger-results.0.2.0.0/tools/repack-sanger-results/repack-sanger-results' params(repackSangerResults_params)
+include cavemanVcfFix as cavemanFix from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/caveman-vcf-fix.0.1.0.0/tools/caveman-vcf-fix/caveman-vcf-fix' params(cavemanVcfFix_params)
 include { extractFilesFromTarball as extractVarSnv; extractFilesFromTarball as extractVarIndel; extractFilesFromTarball as extractQC } from './modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/extract-files-from-tarball.0.2.0.0/tools/extract-files-from-tarball/extract-files-from-tarball' params(extractSangerCall_params)
 include { payloadGenVariantCalling as pGenVarSnv; payloadGenVariantCalling as pGenVarIndel } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-variant-calling.0.1.0.0/tools/payload-gen-variant-calling/payload-gen-variant-calling" params(payloadGenVariantCall_params)
 //include { payloadGenSangerQC as pGenQC } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-sanager-qc.0.1.0.0/tools/payload-gen-sanager-qc/payload-gen-sanager-qc" params(payloadGenSangerQc_params)
@@ -231,8 +236,11 @@ workflow SangerWxs {
         // repack results
         repack(sangerWxs.out.result_archive, 'WXS')
 
+        // fix caveman VCF
+        cavemanFix(repack.out.caveman)
+
         // extract variant calls
-        extractVarSnv(repack.out.caveman, 'flagged.muts')
+        extractVarSnv(cavemanFix.out.fixed_tar, 'flagged.muts')
         extractVarIndel(repack.out.pindel, 'flagged')
 
         pGenVarSnv(
