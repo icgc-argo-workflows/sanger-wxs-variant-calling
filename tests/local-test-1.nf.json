@@ -32,6 +32,10 @@
     "cpus": 1,
     "mem": 1
   },
+  "prepSangerSupplement": {
+    "cpus": 1,
+    "mem": 1
+  },
   "extractSangerCall": {
     "cpus": 1,
     "mem": 1
