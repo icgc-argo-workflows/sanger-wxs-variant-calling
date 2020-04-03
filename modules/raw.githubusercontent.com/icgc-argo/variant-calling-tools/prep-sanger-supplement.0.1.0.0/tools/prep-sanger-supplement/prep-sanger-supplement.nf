@@ -18,48 +18,33 @@
  */
 
 /*
- * Author Junjun Zhang <junjun.zhang@oicr.on.ca>
+ * author Junjun Zhang <junjun.zhang@oicr.on.ca>
+ *        Linda Xiang <linda.xiang@oicr.on.ca>
  */
 
 nextflow.preview.dsl = 2
 version = '0.1.0.0'
 
-params.normal_analysis = ""
-params.tumour_analysis = ""
-params.files_to_upload = []
-params.wf_name = ""
-params.wf_short_name = ""
-params.wf_version = ""
-params.container_version = ''
+params.result_tars = ""
+params.container_version = ""
 params.cpus = 1
-params.mem = 1  // GB
+params.mem = 2  // in GB
 
-process payloadGenVariantCalling {
-  container "quay.io/icgc-argo/payload-gen-variant-calling:payload-gen-variant-calling.${params.container_version ?: version}"
+
+process prepSangerSupplement {
+  container "quay.io/icgc-argo/prep-sanger-supplement:prep-sanger-supplement.${params.container_version ?: version}"
   cpus params.cpus
   memory "${params.mem} GB"
 
   input:
-    path normal_analysis
-    path tumour_analysis
-    path files_to_upload
-    val wf_name
-    val wf_short_name
-    val wf_version
+    path result_tars
 
   output:
-    path "*.variant_calling.payload.json", emit: payload
-    path "out/*{.tgz,.vcf.gz,.vcf.gz.tbi}", emit: files_to_upload
+    path "*.supplement.tgz", emit: supplement_tar
 
   script:
-    args_tumour_analysis = !tumour_analysis.empty() ? "-t ${tumour_analysis}" : ""
     """
-    payload-gen-variant-calling.py \
-         -f ${files_to_upload} \
-         -n ${normal_analysis} \
-         -r ${workflow.runName} \
-         -w ${wf_name} \
-         -s ${wf_short_name} \
-         -v ${wf_version} ${args_tumour_analysis}
+    prep-sanger-supplement.py \
+      -r ${result_tars}
     """
 }

@@ -143,27 +143,45 @@ sangerWxsVariantCaller_params = [
 ]
 
 repackSangerResults_params = [
+    'cpus': params.cpus,
+    'mem': params.mem,
     'library_strategy': 'WXS',
     *:(params.repackSangerResults ?: [:])
 ]
 
+prepSangerSupplement_params = [
+    'cpus': params.cpus,
+    'mem': params.mem,
+    *:(params.prepSangerSupplement ?: [:])
+]
+
 cavemanVcfFix_params = [
+    'cpus': params.cpus,
+    'mem': params.mem,
     *:(params.cavemanVcfFix ?: [:])
 ]
 
 extractSangerCall_params = [
+    'cpus': params.cpus,
+    'mem': params.mem,
     *:(params.extractSangerCall ?: [:])
 ]
 
 payloadGenVariantCall_params = [
+    'cpus': params.cpus,
+    'mem': params.mem,
     *:(params.payloadGenVariantCall ?: [:])
 ]
 
 payloadGenQcMetrics_params = [
+    'cpus': params.cpus,
+    'mem': params.mem,
     *:(params.payloadGenVariantCall ?: [:])
 ]
 
 upload_params = [
+    'cpus': params.cpus,
+    'mem': params.mem,
     'song_container_version': '4.0.0',
     'score_container_version': '3.0.1',
     'song_url': params.song_url,
@@ -179,8 +197,9 @@ include { generateBas as basT; generateBas as basN; } from './modules/raw.github
 include sangerWxsVariantCaller as sangerWxs from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/sanger-wxs-variant-caller.3.1.6-2/tools/sanger-wxs-variant-caller/sanger-wxs-variant-caller.nf' params(sangerWxsVariantCaller_params)
 include repackSangerResults as repack from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/repack-sanger-results.0.2.0.0/tools/repack-sanger-results/repack-sanger-results' params(repackSangerResults_params)
 include cavemanVcfFix as cavemanFix from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/caveman-vcf-fix.0.1.0.0/tools/caveman-vcf-fix/caveman-vcf-fix' params(cavemanVcfFix_params)
+include prepSangerSupplement as prepSupp from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/prep-sanger-supplement.0.1.0.0/tools/prep-sanger-supplement/prep-sanger-supplement' params(prepSangerSupplement_params)
 include { extractFilesFromTarball as extractVarSnv; extractFilesFromTarball as extractVarIndel; extractFilesFromTarball as extractQC } from './modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/extract-files-from-tarball.0.2.0.0/tools/extract-files-from-tarball/extract-files-from-tarball' params(extractSangerCall_params)
-include { payloadGenVariantCalling as pGenVarSnv; payloadGenVariantCalling as pGenVarIndel } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-variant-calling.0.1.0.0/tools/payload-gen-variant-calling/payload-gen-variant-calling" params(payloadGenVariantCall_params)
+include { payloadGenVariantCalling as pGenVarSnv; payloadGenVariantCalling as pGenVarIndel; payloadGenVariantCalling as pGenVarSupp } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-variant-calling.0.1.0.0/tools/payload-gen-variant-calling/payload-gen-variant-calling" params(payloadGenVariantCall_params)
 //include { payloadGenSangerQC as pGenQC } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-sanager-qc.0.1.0.0/tools/payload-gen-sanager-qc/payload-gen-sanager-qc" params(payloadGenSangerQc_params)
 include { songScoreUpload as upVarSnv; songScoreUpload as upVarIndel; songScoreUpload as upQC} from './song-score-utils/song-score-upload' params(upload_params)
 include cleanupWorkdir as cleanup from './modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/b45093d3ecc3cb98407549158c5315991802526b/process/cleanup-workdir'
@@ -243,6 +262,9 @@ workflow SangerWxs {
         extractVarSnv(cavemanFix.out.fixed_tar, 'flagged.muts')
         extractVarIndel(repack.out.pindel, 'flagged')
 
+        // prepare variant call supplements
+        prepSupp(cavemanFix.out.fixed_tar.concat(repack.out.pindel).collect())
+
         pGenVarSnv(
             dnldN.out.song_analysis, dnldT.out.song_analysis,
             extractVarSnv.out.extracted_files,
@@ -253,10 +275,16 @@ workflow SangerWxs {
             extractVarIndel.out.extracted_files,
             name, short_name, version
         )
+        pGenVarSupp(
+            dnldN.out.song_analysis, dnldT.out.song_analysis,
+            prepSupp.out.supplement_tar,
+            name, short_name, version
+        )
 
         // upload variant results in paralllel
         upVarSnv(study_id, pGenVarSnv.out.payload, pGenVarSnv.out.files_to_upload)
         upVarIndel(study_id, pGenVarIndel.out.payload, pGenVarIndel.out.files_to_upload)
+        upVarSupp(study_id, pGenVarSupp.out.payload, pGenVarSupp.out.files_to_upload)
 
         /*  // more to flesh out
         qc_result_patterns = Channel.from(
@@ -271,9 +299,12 @@ workflow SangerWxs {
 
         if (params.cleanup) {
             cleanup(
-                dnldT.out.files.concat(dnldN.out, basT.out, basN.out, sangerWxs.out,
-                    repack.out, extractVarSnv.out, extractVarIndel.out).collect(),
-                upVar.out.analysis_id.collect())
+                dnldT.out.files.concat(
+                    dnldN.out, basT.out, basN.out, sangerWxs.out,
+                    repack.out, extractVarSnv.out, extractVarIndel.out, prepSupp.out).collect(),
+                upVarSnv.out.analysis_id.concat(
+                    upVarIndel.out.analysis_id, upVarSupp.out.analysis_id
+                ).collect())
         }
 
 }
