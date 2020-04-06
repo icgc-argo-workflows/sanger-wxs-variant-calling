@@ -117,8 +117,6 @@ params.cpus = 1
 params.mem = 1
 
 download_params = [
-    'song_container_version': '4.0.0',
-    'score_container_version': '3.0.1',
     'song_url': params.song_url,
     'score_url': params.score_url,
     'api_token': params.api_token,
@@ -173,17 +171,15 @@ payloadGenVariantCall_params = [
     *:(params.payloadGenVariantCall ?: [:])
 ]
 
-payloadGenQcMetrics_params = [
+payloadGenSangerQc_params = [
     'cpus': params.cpus,
     'mem': params.mem,
-    *:(params.payloadGenVariantCall ?: [:])
+    *:(params.payloadGenSangerQc ?: [:])
 ]
 
 upload_params = [
     'cpus': params.cpus,
     'mem': params.mem,
-    'song_container_version': '4.0.0',
-    'score_container_version': '3.0.1',
     'song_url': params.song_url,
     'score_url': params.score_url,
     'api_token': params.api_token,
@@ -200,8 +196,8 @@ include cavemanVcfFix as cavemanFix from './modules/raw.githubusercontent.com/ic
 include prepSangerSupplement as prepSupp from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/prep-sanger-supplement.0.1.0.0/tools/prep-sanger-supplement/prep-sanger-supplement' params(prepSangerSupplement_params)
 include { extractFilesFromTarball as extractVarSnv; extractFilesFromTarball as extractVarIndel; extractFilesFromTarball as extractQC } from './modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/extract-files-from-tarball.0.2.0.0/tools/extract-files-from-tarball/extract-files-from-tarball' params(extractSangerCall_params)
 include { payloadGenVariantCalling as pGenVarSnv; payloadGenVariantCalling as pGenVarIndel; payloadGenVariantCalling as pGenVarSupp } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-variant-calling.0.1.0.0/tools/payload-gen-variant-calling/payload-gen-variant-calling" params(payloadGenVariantCall_params)
-//include { payloadGenSangerQC as pGenQC } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-sanager-qc.0.1.0.0/tools/payload-gen-sanager-qc/payload-gen-sanager-qc" params(payloadGenSangerQc_params)
-include { songScoreUpload as upVarSnv; songScoreUpload as upVarIndel; songScoreUpload as upQC; songScoreUpload as upVarSupp} from './song-score-utils/song-score-upload' params(upload_params)
+include { payloadGenSangerQc as pGenQc } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-sanger-qc.0.1.1.0/tools/payload-gen-sanger-qc/payload-gen-sanger-qc" params(payloadGenSangerQc_params)
+include { songScoreUpload as upVarSnv; songScoreUpload as upVarIndel; songScoreUpload as upQc; songScoreUpload as upVarSupp} from './song-score-utils/song-score-upload' params(upload_params)
 include cleanupWorkdir as cleanup from './modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/b45093d3ecc3cb98407549158c5315991802526b/process/cleanup-workdir'
 
 
@@ -280,30 +276,27 @@ workflow SangerWxs {
             prepSupp.out.supplement_tar,
             name, short_name, version
         )
+        pGenQc(
+            dnldN.out.song_analysis, dnldT.out.song_analysis,
+            repack.out.normal_contamination.concat(
+                repack.out.tumour_contamination, repack.out.genotyped, basT.out.bas_file, basN.out.bas_file
+            ).collect(),
+            name, short_name, version
+        )
 
         // upload variant results in paralllel
         upVarSnv(study_id, pGenVarSnv.out.payload, pGenVarSnv.out.files_to_upload)
         upVarIndel(study_id, pGenVarIndel.out.payload, pGenVarIndel.out.files_to_upload)
         upVarSupp(study_id, pGenVarSupp.out.payload, pGenVarSupp.out.files_to_upload)
-
-        /*  // more to flesh out
-        qc_result_patterns = Channel.from(
-            '???', '???')
-        extractQC(repack.out.collect(), qc_result_patterns.flatten())
-
-        payloadGenSangerQC(dnldT.out.song_analysis, extractQC.out)
-
-        upQC(study_id, payloadGenSangerQC.out.payload, extractQC.out)
-        */
-
+        upQc(study_id, pGenQc.out.payload, pGenQc.out.qc_files)
 
         if (params.cleanup) {
             cleanup(
                 dnldT.out.files.concat(
-                    dnldN.out, basT.out, basN.out, sangerWxs.out,
+                    dnldN.out, basT.out, basN.out, sangerWxs.out, pGenQc.out,
                     repack.out, extractVarSnv.out, extractVarIndel.out, prepSupp.out).collect(),
                 upVarSnv.out.analysis_id.concat(
-                    upVarIndel.out.analysis_id, upVarSupp.out.analysis_id
+                    upVarIndel.out.analysis_id, upVarSupp.out.analysis_id, upQc.out.analysis_id
                 ).collect())
         }
 
