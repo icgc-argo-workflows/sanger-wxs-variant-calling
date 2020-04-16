@@ -289,8 +289,8 @@ workflow SangerWxs {
         if (params.cleanup) {
             cleanup(
                 dnldT.out.files.concat(
-                    dnldN.out, basT.out, basN.out, sangerWxs.out, pGenQc.out,
-                    repack.out, prepSupp.out).collect(),
+                    dnldN.out, basT.out, basN.out, sangerWxs.out, pGenVarSnv.out, pGenVarIndel.out,
+                    pGenVarSupp.out, pGenQc.out, repack.out, prepSupp.out, prepQc.out).collect(),
                 upVarSnv.out.analysis_id.concat(
                     upVarIndel.out.analysis_id, upVarSupp.out.analysis_id, upQc.out.analysis_id
                 ).collect())
