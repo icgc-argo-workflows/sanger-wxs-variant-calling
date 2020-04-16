@@ -259,7 +259,7 @@ workflow SangerWxs {
         extractVarIndel(repack.out.pindel, 'flagged')
 
         // prepare variant call supplements
-        prepSupp(cavemanFix.out.fixed_tar.concat(repack.out.pindel).collect())
+        prepSupp(cavemanFix.out.fixed_tar.concat(repack.out.pindel, sangerWxs.out.timings).collect())
 
         pGenVarSnv(
             dnldN.out.song_analysis, dnldT.out.song_analysis,
@@ -273,7 +273,7 @@ workflow SangerWxs {
         )
         pGenVarSupp(
             dnldN.out.song_analysis, dnldT.out.song_analysis,
-            prepSupp.out.supplement_tar,
+            prepSupp.out.supplement_tar.collect(),
             name, short_name, version
         )
         pGenQc(
