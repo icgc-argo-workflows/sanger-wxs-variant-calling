@@ -34,6 +34,7 @@ params.song_url = ""
 params.score_url = ""
 params.cpus = 1
 params.mem = 1  // GB
+params.cleanup = true
 
 include SangerWxs from "../main" params(params)
 
