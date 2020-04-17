@@ -5,16 +5,16 @@ nextflow.preview.dsl=2
 params.song_cpus = 1
 params.song_mem = 1
 params.song_api_token = ''
-params.score_cpus = 2
-params.score_mem = 4
+params.score_cpus = 8
+params.score_mem = 20
 params.score_transport_mem = 2
 params.score_api_token = ''
 params.extract_cpus = 1
 params.extract_mem = 1
 
 // required params w/ default
-params.song_container_version = '4.0.0'
-params.score_container_version = '3.0.1'
+params.song_container_version = '4.2.0'
+params.score_container_version = '5.0.0'
 params.extract_container_version = 'latest'
 
 // required params, no default
@@ -47,11 +47,10 @@ extract_params = [
 
 // import modules
 // TODO: change import for song_manifest after it's updated (use non-root docker image) on the other git repo
-include songSubmit as songSub from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/1.0.0/process/song_submit' params(song_params)
-include songManifest as songMan from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/1.0.0/process/song_manifest' params(song_params)
-include scoreUpload as scoreUp from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/1.0.0/process/score_upload' params(score_params)
-include songPublish as songPub from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/1.0.0/process/song_publish' params(song_params)
-include extractAnalysisId as getId from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/1.0.0/process/extract_analysis_id' params(extract_params)
+include songSubmit as songSub from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/1.1.3/process/song_submit' params(song_params)
+include songManifest as songMan from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/1.1.3/process/song_manifest' params(song_params)
+include scoreUpload as scoreUp from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/1.1.3/process/score_upload' params(score_params)
+include songPublish as songPub from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/1.1.3/process/song_publish' params(song_params)
 
 workflow songScoreUpload {
     take:
@@ -63,14 +62,11 @@ workflow songScoreUpload {
         // Create new analysis
         songSub(study_id, payload, song_params.api_token)
 
-        // Extract and save analysis_id
-        getId(songSub.out)
-
         // Generate file manifest for upload
-        songMan(study_id, getId.out, upload, song_params.api_token)
+        songMan(study_id, songSub.out, upload, song_params.api_token)
 
         // Upload to SCORE
-        scoreUp(getId.out, songMan.out, upload, song_params.api_token)
+        scoreUp(songSub.out, songMan.out, upload, song_params.api_token)
 
         // Publish the analysis
         songPub(study_id, scoreUp.out.ready_to_publish, song_params.api_token)
