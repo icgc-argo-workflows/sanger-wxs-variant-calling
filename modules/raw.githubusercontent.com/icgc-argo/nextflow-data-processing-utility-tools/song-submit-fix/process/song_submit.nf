@@ -35,6 +35,6 @@ process songSubmit {
     export CLIENT_STUDY_ID=${study_id}
 
     set -euxo pipefail
-    sing submit -f ${payload} | jq -er .analysisId
+    sing submit -f ${payload} | jq -er .analysisId | tr -d '\\n'
     """
 }
