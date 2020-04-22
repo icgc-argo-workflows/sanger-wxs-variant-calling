@@ -6,35 +6,34 @@ params.cpus = 1
 params.mem = 1
 
 // required params w/ default
-params.container_version = '7b347887'
+params.container_version = '4.2.1'
 
 // required params, no default
 // --song_url         song url for download process (defaults to main song_url param)
 // --api_token        song/score API token for download process (defaults to main api_token param)
 
-process songSubmit {
+process songManifest {
     
     cpus params.cpus
     memory "${params.mem} GB"
  
     container "overture/song-client:${params.container_version}"
-    
-    tag "${study_id}"
-    label "songSubmit"
-    
+
+    tag "${analysis_id}"
+
     input:
         val study_id
-        path payload
+        val analysis_id
+        path upload
         env CLIENT_ACCESS_TOKEN
     
     output:
-        stdout()
+        path 'out/manifest.txt'
 
     """
     export CLIENT_SERVER_URL=${params.song_url}
     export CLIENT_STUDY_ID=${study_id}
 
-    set -euxo pipefail
-    sing submit -f ${payload} | jq -er .analysisId | tr -d '\\n'
+    sing manifest -a ${analysis_id} -d . -f ./out/manifest.txt
     """
 }
