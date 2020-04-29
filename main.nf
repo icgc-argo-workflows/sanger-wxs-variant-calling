@@ -275,7 +275,7 @@ workflow SangerWxs {
             name, short_name, version
         )
 
-        prepQc(basN.out.bas_file.concat(basT.out.bas_file).collect())
+        prepQc(basN.out.bas_file_with_tn.concat(basT.out.bas_file_with_tn).collect())
         pGenQc(dnldN.out.song_analysis, dnldT.out.song_analysis,
                  prepQc.out.qc_metrics_tar,
                  name, short_name, version)
