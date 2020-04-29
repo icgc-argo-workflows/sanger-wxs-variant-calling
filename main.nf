@@ -188,7 +188,7 @@ upload_params = [
 
 // Include all modules and pass params
 include { songScoreDownload as dnldT; songScoreDownload as dnldN } from './song-score-utils/song-score-download' params(download_params)
-include { generateBas as basT; generateBas as basN; } from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/generate-bas.0.2.0.0/tools/generate-bas/generate-bas' params(generateBas_params)
+include { generateBas as basT; generateBas as basN; } from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/generate-bas.0.2.1.0/tools/generate-bas/generate-bas' params(generateBas_params)
 include sangerWxsVariantCaller as sangerWxs from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/sanger-wxs-variant-caller.3.1.6-3/tools/sanger-wxs-variant-caller/sanger-wxs-variant-caller.nf' params(sangerWxsVariantCaller_params)
 include repackSangerResults as repack from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/repack-sanger-results.0.2.0.0/tools/repack-sanger-results/repack-sanger-results' params(repackSangerResults_params)
 include cavemanVcfFix as cavemanFix from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/caveman-vcf-fix.0.1.0.0/tools/caveman-vcf-fix/caveman-vcf-fix' params(cavemanVcfFix_params)
@@ -223,13 +223,13 @@ workflow SangerWxs {
 
         // generate Bas for tumour
         basT(
-            dnldT.out.files.flatten().first(), dnldT.out.files.flatten().last(),
+            'tumour', dnldT.out.files.flatten().first(), dnldT.out.files.flatten().last(),
             file(params.generateBas.ref_genome_fa),
             Channel.fromPath(getSecondaryFiles(params.generateBas.ref_genome_fa, ['.fai']), checkIfExists: true).collect())
 
         // generate Bas for normal
         basN(
-            dnldN.out.files.flatten().first(), dnldN.out.files.flatten().last(),
+            'normal', dnldN.out.files.flatten().first(), dnldN.out.files.flatten().last(),
             file(params.generateBas.ref_genome_fa),
             Channel.fromPath(getSecondaryFiles(params.generateBas.ref_genome_fa, ['.fai']), checkIfExists: true).collect())
 
