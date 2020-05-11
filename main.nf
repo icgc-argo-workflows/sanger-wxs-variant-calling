@@ -116,6 +116,17 @@ params.cleanup = true
 params.cpus = 1
 params.mem = 1
 
+params.download = [:]
+params.generateBas = [:]
+params.sangerWxsVariantCaller = [:]
+params.repackSangerResults = [:]
+params.prepSangerSupplement = [:]
+params.prepSangerQc = [:]
+params.cavemanVcfFix = [:]
+params.extractSangerCal = [:]
+params.payloadGenVariantCall = [:]
+params.uploadVariant = [:]
+
 download_params = [
     'song_url': params.song_url,
     'score_url': params.score_url,
