@@ -48,10 +48,6 @@
     "cpus": 1,
     "mem": 1
   },
-  "payloadGenSangerQc": {
-    "cpus": 1,
-    "mem": 1
-  },
   "uploadVariant": {
     "cpus": 1,
     "mem": 1

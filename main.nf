@@ -126,6 +126,7 @@ params.cavemanVcfFix = [:]
 params.extractSangerCal = [:]
 params.payloadGenVariantCall = [:]
 params.uploadVariant = [:]
+params.extractSangerCall = [:]
 
 download_params = [
     'song_url': params.song_url,
@@ -303,8 +304,8 @@ workflow SangerWxs {
                     dnldN.out, basT.out, basN.out, sangerWxs.out, pGenVarSnv.out, pGenVarIndel.out,
                     pGenVarSupp.out, pGenQc.out, repack.out, prepSupp.out, prepQc.out).collect(),
                 upSnv.out.analysis_id.concat(
-                    upIndel.out.analysis_id, upSupp.out.analysis_id, upQc.out.analysis_id
-                ).collect())
+                    upIndel.out.analysis_id, upSupp.out.analysis_id, upQc.out.analysis_id).collect()
+            )
         }
 
 }
