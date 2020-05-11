@@ -7,7 +7,7 @@ version = '3.1.6-3-rc.3-dev'
 
 /*
 ========================================================================================
-                    ICGC-ARGO Sanger WGS Variant Calling Pipeline
+                    ICGC-ARGO Sanger WXS Variant Calling Pipeline
 ========================================================================================
 #### Homepage / Documentation
 https://github.com/icgc-argo/sanger-wxs-variant-calling
@@ -18,8 +18,8 @@ Linda Xiang @lindaxiang <linda.xiang@oicr.on.ca>
 
 Required Parameters (no default):
 --study_id                              SONG study ID
---tumour_aln_analysis_id                Tumour WGS sequencing_alignment SONG analysis ID
---normal_aln_analysis_id                Normal WGS sequencing_alignment SONG analysis ID
+--tumour_aln_analysis_id                Tumour WXS sequencing_alignment SONG analysis ID
+--normal_aln_analysis_id                Normal WXS sequencing_alignment SONG analysis ID
 --ref_genome_fa                         Reference genome '.fa' file, secondary file ('.fa.fai') is expected to be under the same folder
 --sanger_ref_genome_tar                 Tarball containing reference genome files from the same genome build
 --sanger_vagrent_annot                  Tarball containing VAGrENT annotation reference
@@ -75,7 +75,7 @@ repackSangerResults Parameters (object):
     container_version                   docker container version, defaults to unset
     cpus                                cpus for bamMergeSortMarkdup container, defaults to cpus parameter
     mem                                 memory (GB) for bamMergeSortMarkdup container, defaults to mem parameter
-    library_strategy                    library strategy of input reads, default: WGS
+    library_strategy                    library strategy of input reads, default: WXS
 }
 
 payloadGenVariantCall (object):
