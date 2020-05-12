@@ -23,28 +23,28 @@
  */
 
 nextflow.preview.dsl = 2
-version = '0.1.0.0'
+version = '0.1.2.0'
 
-params.qc_files = ""
+params.result_tars = ""
 params.container_version = ""
 params.cpus = 1
 params.mem = 2  // in GB
 
 
-process prepSangerQc {
-  container "quay.io/icgc-argo/prep-sanger-qc:prep-sanger-qc.${params.container_version ?: version}"
+process prepSangerSupplement {
+  container "quay.io/icgc-argo/prep-sanger-supplement:prep-sanger-supplement.${params.container_version ?: version}"
   cpus params.cpus
   memory "${params.mem} GB"
 
   input:
-    path qc_files
+    path result_tars
 
   output:
-    path "*_metrics.tgz", emit: qc_metrics_tar
+    path "*.*-supplement.tgz", emit: supplement_tar
 
   script:
     """
-    prep-sanger-qc.py \
-      -r ${qc_files}
+    prep-sanger-supplement.py \
+      -r ${result_tars}
     """
 }
