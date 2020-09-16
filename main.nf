@@ -109,6 +109,7 @@ params.study_id = ""
 params.tumour_aln_analysis_id = ""
 params.normal_aln_analysis_id = ""
 params.api_token = ""
+params.rdpc_secret_name = "no_secret"  // default can't be null, to be over-written in config or params-file
 params.song_url = ""
 params.score_url = ""
 params.cleanup = true
