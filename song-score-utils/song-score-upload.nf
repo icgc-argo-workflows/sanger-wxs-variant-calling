@@ -27,7 +27,6 @@ song_params = [
     'cpus': params.song_cpus,
     'mem': params.song_mem,
     'container_version': params.song_container_version,
-    'rdpc_secret_name': params.rdpc_secret_name,
     'api_token': params.song_api_token ?: params.api_token
 ]
 
@@ -37,7 +36,6 @@ score_params = [
     'mem': params.score_mem,
     'transport_mem': params.score_transport_mem,
     'container_version': params.score_container_version,
-    'rdpc_secret_name': params.rdpc_secret_name,
     'api_token': params.score_api_token ?: params.api_token
 ]
 
@@ -49,10 +47,10 @@ extract_params = [
 
 // import modules
 // TODO: change import for song_manifest after it's updated (use non-root docker image) on the other git repo
-include { songSubmit as songSub } from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/2.2.0/process/song_submit' params(song_params)
-include { songManifest as songMan } from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/2.2.0/process/song_manifest' params(song_params)
-include { scoreUpload as scoreUp } from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/2.2.0/process/score_upload' params(score_params)
-include { songPublish as songPub } from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/2.2.0/process/song_publish' params(song_params)
+include { songSubmit as songSub } from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/2.3.0/process/song_submit' params(song_params)
+include { songManifest as songMan } from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/2.3.0/process/song_manifest' params(song_params)
+include { scoreUpload as scoreUp } from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/2.3.0/process/score_upload' params(score_params)
+include { songPublish as songPub } from '../modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/2.3.0/process/song_publish' params(song_params)
 
 workflow songScoreUpload {
     take:
