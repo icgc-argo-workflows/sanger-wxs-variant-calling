@@ -21,7 +21,7 @@
  * author Junjun Zhang <junjun.zhang@oicr.on.ca>
  */
 
-nextflow.preview.dsl=2
+nextflow.enable.dsl=2
 
 params.tumour_aln_analysis_id = ""
 params.normal_aln_analysis_id = ""
@@ -36,7 +36,7 @@ params.cpus = 1
 params.mem = 1  // GB
 params.cleanup = true
 
-include SangerWxs from "../main" params(params)
+include { SangerWxs } from "../main" params(params)
 
 
 workflow {
