@@ -208,15 +208,8 @@ include { prepSangerQc as prepQc } from './modules/raw.githubusercontent.com/icg
 include { extractFilesFromTarball as extractVarSnv; extractFilesFromTarball as extractVarIndel; extractFilesFromTarball as extractQC } from './modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/extract-files-from-tarball.0.2.0.0/tools/extract-files-from-tarball/extract-files-from-tarball' params(extractSangerCall_params)
 include { payloadGenVariantCalling as pGenVarSnv; payloadGenVariantCalling as pGenVarIndel; payloadGenVariantCalling as pGenVarSupp; payloadGenVariantCalling as pGenQc } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-variant-calling.0.3.4.0/tools/payload-gen-variant-calling/payload-gen-variant-calling" params(payloadGenVariantCall_params)
 include { songScoreUpload as upSnv; songScoreUpload as upIndel; songScoreUpload as upQc; songScoreUpload as upSupp} from './song-score-utils/song-score-upload' params(upload_params)
-include { cleanupWorkdir as cleanup } from './modules/raw.githubusercontent.com/icgc-argo/nextflow-data-processing-utility-tools/2.3.0/process/cleanup-workdir'
-
-def getSecondaryFiles(main_file, exts){  //this is kind of like CWL's secondary files
-  def all_files = []
-  for (ext in exts) {
-    all_files.add(main_file + ext)
-  }
-  return all_files
-}
+include { cleanupWorkdir as cleanup } from './wfpr_modules/github.com/icgc-argo/data-processing-utility-tools/cleanup-workdir@1.0.0/main'
+include { getSecondaryFiles } from './wfpr_modules/github.com/icgc-argo/data-processing-utility-tools/helper-functions@1.0.0/main'
 
 
 workflow SangerWxs {
@@ -236,13 +229,13 @@ workflow SangerWxs {
         basT(
             'tumour', dnldT.out.files.flatten().first(), dnldT.out.files.flatten().last(),
             file(params.generateBas.ref_genome_fa),
-            Channel.fromPath(getSecondaryFiles(params.generateBas.ref_genome_fa, ['.fai']), checkIfExists: true).collect())
+            Channel.fromPath(getSecondaryFiles(params.generateBas.ref_genome_fa, ['fai']), checkIfExists: true).collect())
 
         // generate Bas for normal
         basN(
             'normal', dnldN.out.files.flatten().first(), dnldN.out.files.flatten().last(),
             file(params.generateBas.ref_genome_fa),
-            Channel.fromPath(getSecondaryFiles(params.generateBas.ref_genome_fa, ['.fai']), checkIfExists: true).collect())
+            Channel.fromPath(getSecondaryFiles(params.generateBas.ref_genome_fa, ['fai']), checkIfExists: true).collect())
 
         // run Sanger WXS
         sangerWxs(
