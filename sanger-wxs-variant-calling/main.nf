@@ -108,6 +108,15 @@ Upload Parameters (object):
 params.study_id = ""
 params.tumour_aln_analysis_id = ""
 params.normal_aln_analysis_id = ""
+
+// the following four if provided local files will be used
+params.tumour_aln_metadata = "NO_FILE1"
+params.tumour_aln_cram = "NO_FILE2"
+params.normal_aln_metadata = "NO_FILE3"
+params.normal_aln_cram = "NO_FILE4"
+
+params.publish_dir = ""  // dir for outputs, must be set when running in local mode
+
 params.api_token = ""
 params.song_url = ""
 params.score_url = ""
@@ -217,23 +226,65 @@ workflow SangerWxs {
         study_id
         tumour_aln_analysis_id
         normal_aln_analysis_id
+        tumour_aln_metadata
+        tumour_aln_cram
+        normal_aln_metadata
+        normal_aln_cram
 
     main:
-        // download tumour aligned seq and metadata from song/score (analysis type: sequencing_alignment)
-        dnldT(study_id, tumour_aln_analysis_id)
+        local_mode = false
 
-        // download normal aligned seq and metadata from song/score (analysis type: sequencing_alignment)
-        dnldN(study_id, normal_aln_analysis_id)
+        tumour_aln_seq = Channel.from()
+        tumour_aln_seq_idx = Channel.from()
+        normal_aln_seq = Channel.from()
+        normal_aln_seq_idx = Channel.from()
+
+        if (tumour_aln_analysis_id && normal_aln_analysis_id) {
+            log.info "Run the workflow using input metadata / sequencing data from SONG/SCORE servers"
+
+            // download tumour aligned seq and metadata from song/score (analysis type: sequencing_alignment)
+            dnldT(study_id, tumour_aln_analysis_id)
+            tumour_aln_seq = dnldT.out.files.flatten().first()
+            tumour_aln_seq_idx = dnldT.out.files.flatten().last()
+            tumour_aln_meta = dnldT.out.song_analysis
+
+            // download normal aligned seq and metadata from song/score (analysis type: sequencing_alignment)
+            dnldN(study_id, normal_aln_analysis_id)
+            normal_aln_seq = dnldN.out.files.flatten().first()
+            normal_aln_seq_idx = dnldN.out.files.flatten().last()
+            normal_aln_meta = dnldN.out.song_analysis
+        } else if (
+            !tumour_aln_metadata.startsWith('NO_FILE') && \
+            !tumour_aln_cram.startsWith('NO_FILE') && \
+            !normal_aln_metadata.startsWith('NO_FILE') && \
+            !normal_aln_cram.startsWith('NO_FILE')
+        ) {
+            if (!params.publish_dir) {
+                exit 1, "When use local inputs, params.publish_dir must be specified."
+            } else {
+                log.info "Use local inputs, outputs will be in: ${params.publish_dir}"
+            }
+            local_mode = true
+            tumour_aln_seq = file(tumour_aln_cram)
+            tumour_aln_seq_idx = Channel.fromPath(getSecondaryFiles(tumour_aln_cram, ['crai', 'bai']))
+            tumour_aln_meta = file(tumour_aln_metadata)
+            normal_aln_seq = file(normal_aln_cram)
+            normal_aln_seq_idx = Channel.fromPath(getSecondaryFiles(normal_aln_cram, ['crai', 'bai']))
+            normal_aln_meta = file(normal_aln_metadata)
+        } else {
+            exit 1, "To download input aligned seq files from SONG/SCORE, please provide `params.tumour_aln_analysis_id` and `params.normal_aln_analysis_id`.\n" +
+                "Or please provide `params.tumour_aln_metadata`, `params.tumour_aln_cram`, `params.normal_aln_metadata` and `params.normal_aln_cram` to use local files as input."
+        }
 
         // generate Bas for tumour
         basT(
-            'tumour', dnldT.out.files.flatten().first(), dnldT.out.files.flatten().last(),
+            'tumour', tumour_aln_seq, tumour_aln_seq_idx.collect(),
             file(params.generateBas.ref_genome_fa),
             Channel.fromPath(getSecondaryFiles(params.generateBas.ref_genome_fa, ['fai']), checkIfExists: true).collect())
 
         // generate Bas for normal
         basN(
-            'normal', dnldN.out.files.flatten().first(), dnldN.out.files.flatten().last(),
+            'normal', normal_aln_seq, normal_aln_seq_idx.collect(),
             file(params.generateBas.ref_genome_fa),
             Channel.fromPath(getSecondaryFiles(params.generateBas.ref_genome_fa, ['fai']), checkIfExists: true).collect())
 
@@ -242,11 +293,11 @@ workflow SangerWxs {
             file(params.sangerWxsVariantCaller.ref_genome_tar),
             file(params.sangerWxsVariantCaller.vagrent_annot),
             file(params.sangerWxsVariantCaller.ref_snv_indel_tar),
-            dnldT.out.files.flatten().first(),  // aln seq
-            dnldT.out.files.flatten().last(),  // idx
+            tumour_aln_seq,  // aln seq
+            tumour_aln_seq_idx.collect(),  // idx
             basT.out.bas_file,  // bas
-            dnldN.out.files.flatten().first(),  // aln seq
-            dnldN.out.files.flatten().last(),  // idx
+            normal_aln_seq,  // aln seq
+            normal_aln_seq_idx.collect(),  // idx
             basN.out.bas_file  // bas
         )
 
@@ -264,23 +315,23 @@ workflow SangerWxs {
         prepSupp(cavemanFix.out.fixed_tar.concat(repack.out.pindel, sangerWxs.out.timings).collect())
 
         pGenVarSnv(
-            dnldN.out.song_analysis, dnldT.out.song_analysis,
+            normal_aln_meta, tumour_aln_meta,
             extractVarSnv.out.extracted_files,
             name, short_name, version
         )
         pGenVarIndel(
-            dnldN.out.song_analysis, dnldT.out.song_analysis,
+            normal_aln_meta, tumour_aln_meta,
             extractVarIndel.out.extracted_files,
             name, short_name, version
         )
         pGenVarSupp(
-            dnldN.out.song_analysis, dnldT.out.song_analysis,
+            normal_aln_meta, tumour_aln_meta,
             prepSupp.out.supplement_tar.collect(),
             name, short_name, version
         )
 
         prepQc(basN.out.bas_file_with_tn.concat(basT.out.bas_file_with_tn).collect())
-        pGenQc(dnldN.out.song_analysis, dnldT.out.song_analysis,
+        pGenQc(normal_aln_meta, tumour_aln_meta,
                  prepQc.out.qc_metrics_tar,
                  name, short_name, version)
 
@@ -307,6 +358,10 @@ workflow {
     SangerWxs(
         params.study_id,
         params.tumour_aln_analysis_id,
-        params.normal_aln_analysis_id
+        params.normal_aln_analysis_id,
+        params.tumour_aln_metadata,
+        params.tumour_aln_cram,
+        params.normal_aln_metadata,
+        params.normal_aln_cram
     )
 }
