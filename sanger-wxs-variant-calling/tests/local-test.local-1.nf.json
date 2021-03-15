@@ -1,0 +1,21 @@
+{
+  "study_id": "TEST-PR",
+  "tumour_aln_metadata": "1NO_FILE1",
+  "tumour_aln_cram": "2NO_FILE2",
+  "tumour_extra_info": "3NO_FILE3",
+  "normal_aln_metadata": "4NO_FILE4",
+  "normal_aln_cram": "5NO_FILE5",
+  "normal_extra_info": "6NO_FILE6",
+  "publish_dir": "outdir",
+  "sangerWxsVariantCaller": {
+    "cpus": 4,
+    "mem": 4,
+    "exclude": "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr22,chrX,chrY,chrUn%,HLA%,%_alt,%_random,chrM,chrEBV",
+    "vagrent_annot": "reference/VAGrENT_ref_GRCh38_hla_decoy_ebv_ensembl_91.tar.gz",
+    "ref_genome_tar": "reference/core_ref_GRCh38_hla_decoy_ebv.tar.gz",
+    "ref_snv_indel_tar": "reference/SNV_INDEL_ref_GRCh38_hla_decoy_ebv-fragment.tar.gz"  
+  },
+  "generateBas": {
+    "ref_genome_fa": "reference/tiny-grch38-chr11-530001-537000.fa"
+  }
+}
