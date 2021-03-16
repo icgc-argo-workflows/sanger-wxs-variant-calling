@@ -230,8 +230,8 @@ workflow SangerWxs {
         tumour_aln_analysis_id
         normal_aln_analysis_id
         tumour_aln_metadata
-        tumour_extra_info
         tumour_aln_cram
+        tumour_extra_info
         normal_aln_metadata
         normal_aln_cram
         normal_extra_info
@@ -356,7 +356,14 @@ workflow SangerWxs {
         }
 
         if (params.cleanup) {
-            if (!local_mode) {
+            if (local_mode) {
+                cleanup(
+                    basT.out.bas_file.concat(
+                        basN.out, sangerWxs.out, pGenVarSnv.out, pGenVarIndel.out,
+                        pGenVarSupp.out, pGenQc.out, repack.out, prepSupp.out, prepQc.out).collect(),
+                    true
+                )
+            } else {
                 cleanup(
                     dnldT.out.files.concat(
                         dnldN.out, basT.out, basN.out, sangerWxs.out, pGenVarSnv.out, pGenVarIndel.out,
