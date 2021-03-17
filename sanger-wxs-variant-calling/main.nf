@@ -109,7 +109,7 @@ params.study_id = ""
 params.tumour_aln_analysis_id = ""
 params.normal_aln_analysis_id = ""
 
-// the following four if provided local files will be used
+// the following params if provided local files will be used
 params.tumour_aln_metadata = "NO_FILE1"
 params.tumour_aln_cram = "NO_FILE2"
 params.tumour_extra_info = "NO_FILE3"
@@ -117,7 +117,8 @@ params.normal_aln_metadata = "NO_FILE4"
 params.normal_aln_cram = "NO_FILE5"
 params.normal_extra_info = "NO_FILE6"
 
-params.publish_dir = ""  // dir for outputs, must be set when running in local mode
+// dir for outputs, must be set when running in local mode
+params.publish_dir = ""
 
 params.api_token = ""
 params.song_url = ""
@@ -361,14 +362,16 @@ workflow SangerWxs {
                 cleanup(
                     basT.out.bas_file.concat(
                         basN.out, sangerWxs.out, pGenVarSnv.out, pGenVarIndel.out,
-                        pGenVarSupp.out, pGenQc.out, repack.out, prepSupp.out, prepQc.out).collect(),
+                        pGenVarSupp.out, pGenQc.out, repack.out, cavemanFix.out, extractVarSnv.out,
+                        extractVarIndel, prepSupp.out, prepQc.out).collect(),
                     true
                 )
             } else {
                 cleanup(
                     dnldT.out.files.concat(
                         dnldN.out, basT.out, basN.out, sangerWxs.out, pGenVarSnv.out, pGenVarIndel.out,
-                        pGenVarSupp.out, pGenQc.out, repack.out, prepSupp.out, prepQc.out).collect(),
+                        pGenVarSupp.out, pGenQc.out, repack.out, cavemanFix.out, extractVarSnv.out,
+                        extractVarIndel, prepSupp.out, prepQc.out).collect(),
                     upSnv.out.analysis_id.concat(
                         upIndel.out.analysis_id, upSupp.out.analysis_id, upQc.out.analysis_id).collect()
                 )
