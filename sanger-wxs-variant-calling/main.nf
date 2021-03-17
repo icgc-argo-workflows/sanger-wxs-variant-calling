@@ -221,7 +221,7 @@ include { prepSangerQc as prepQc } from './modules/raw.githubusercontent.com/icg
 include { extractFilesFromTarball as extractVarSnv; extractFilesFromTarball as extractVarIndel; extractFilesFromTarball as extractQC } from './modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/extract-files-from-tarball.0.2.0.0/tools/extract-files-from-tarball/extract-files-from-tarball' params(extractSangerCall_params)
 include { payloadGenVariantCalling as pGenVarSnv; payloadGenVariantCalling as pGenVarIndel; payloadGenVariantCalling as pGenVarSupp; payloadGenVariantCalling as pGenQc } from "./modules/raw.githubusercontent.com/icgc-argo/data-processing-utility-tools/payload-gen-variant-calling.0.3.4.0/tools/payload-gen-variant-calling/payload-gen-variant-calling" params(payloadGenVariantCall_params)
 include { songScoreUpload as upSnv; songScoreUpload as upIndel; songScoreUpload as upQc; songScoreUpload as upSupp} from './song-score-utils/song-score-upload' params(upload_params)
-include { cleanupWorkdir as cleanup; cleanupWorkdir as cleanup2 } from './wfpr_modules/github.com/icgc-argo/data-processing-utility-tools/cleanup-workdir@1.0.0/main'
+include { cleanupWorkdir as cleanup } from './wfpr_modules/github.com/icgc-argo/data-processing-utility-tools/cleanup-workdir@1.0.0/main'
 include { getSecondaryFiles } from './wfpr_modules/github.com/icgc-argo/data-processing-utility-tools/helper-functions@1.0.0/main'
 include { payloadAddUniformIds as pAddIdT; payloadAddUniformIds as pAddIdN } from './wfpr_modules/github.com/icgc-argo/data-processing-utility-tools/payload-add-uniform-ids@0.1.1/main'
 
@@ -362,25 +362,18 @@ workflow SangerWxs {
                 cleanup(
                     basT.out.bas_file.concat(
                         basN.out, sangerWxs.out, pGenVarSnv.out, pGenVarIndel.out,
-                        pGenVarSupp.out, pGenQc.out, repack.out, cavemanFix.out, extractVarSnv.out,
-                        extractVarIndel.out, prepSupp.out, prepQc.out).collect(),
-                    true
-                )
-                cleanup2(
-                    cavemanFix.out.fixed_tar.concat(extractVarSnv.out, extractVarIndel.out).collect(),
+                        pGenVarSupp.out, pGenQc.out, repack.out.pindel, cavemanFix.out.fixed_tar,
+                        extractVarSnv.out.extracted_files, extractVarIndel.out.extracted_files,
+                        prepSupp.out, prepQc.out).collect(),
                     true
                 )
             } else {
                 cleanup(
                     dnldT.out.files.concat(
                         dnldN.out, basT.out, basN.out, sangerWxs.out, pGenVarSnv.out, pGenVarIndel.out,
-                        pGenVarSupp.out, pGenQc.out, repack.out, cavemanFix.out, extractVarSnv.out,
-                        extractVarIndel.out, prepSupp.out, prepQc.out).collect(),
-                    upSnv.out.analysis_id.concat(
-                        upIndel.out.analysis_id, upSupp.out.analysis_id, upQc.out.analysis_id).collect()
-                )
-                cleanup2(
-                    cavemanFix.out.fixed_tar.concat(extractVarSnv.out, extractVarIndel.out).collect(),
+                        pGenVarSupp.out, pGenQc.out, repack.out.pindel, cavemanFix.out.fixed_tar,
+                        extractVarSnv.out.extracted_files, extractVarIndel.out.extracted_files,
+                        prepSupp.out, prepQc.out).collect(),
                     upSnv.out.analysis_id.concat(
                         upIndel.out.analysis_id, upSupp.out.analysis_id, upQc.out.analysis_id).collect()
                 )
