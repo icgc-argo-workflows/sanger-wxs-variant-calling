@@ -195,6 +195,7 @@ extractSangerCall_params = [
 payloadGenVariantCall_params = [
     'cpus': params.cpus,
     'mem': params.mem,
+    'publish_dir': params.publish_dir,
     *:(params.payloadGenVariantCall ?: [:])
 ]
 
