@@ -363,7 +363,7 @@ workflow SangerWxs {
                     basT.out.bas_file.concat(
                         basN.out, sangerWxs.out, pGenVarSnv.out, pGenVarIndel.out,
                         pGenVarSupp.out, pGenQc.out, repack.out, cavemanFix.out, extractVarSnv.out,
-                        extractVarIndel, prepSupp.out, prepQc.out).collect(),
+                        extractVarIndel.out, prepSupp.out, prepQc.out).collect(),
                     true
                 )
             } else {
@@ -371,7 +371,7 @@ workflow SangerWxs {
                     dnldT.out.files.concat(
                         dnldN.out, basT.out, basN.out, sangerWxs.out, pGenVarSnv.out, pGenVarIndel.out,
                         pGenVarSupp.out, pGenQc.out, repack.out, cavemanFix.out, extractVarSnv.out,
-                        extractVarIndel, prepSupp.out, prepQc.out).collect(),
+                        extractVarIndel.out, prepSupp.out, prepQc.out).collect(),
                     upSnv.out.analysis_id.concat(
                         upIndel.out.analysis_id, upSupp.out.analysis_id, upQc.out.analysis_id).collect()
                 )
