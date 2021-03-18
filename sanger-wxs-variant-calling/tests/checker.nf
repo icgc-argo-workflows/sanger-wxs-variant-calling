@@ -25,7 +25,18 @@ nextflow.enable.dsl=2
 
 params.tumour_aln_analysis_id = ""
 params.normal_aln_analysis_id = ""
-params.files_to_upload = []
+
+// the following four if provided local files will be used
+params.tumour_aln_metadata = "NO_FILE1"
+params.tumour_aln_cram = "NO_FILE2"
+params.tumour_extra_info = "NO_FILE3"
+params.normal_aln_metadata = "NO_FILE4"
+params.normal_aln_cram = "NO_FILE5"
+params.normal_extra_info = "NO_FILE6"
+
+params.publish_dir = ""  // dir for outputs, must be set when running in local mode
+
+
 params.wf_name = ""
 params.wf_short_name = ""
 params.wf_version = ""
@@ -43,6 +54,12 @@ workflow {
   SangerWxs(
     params.study_id,
     params.tumour_aln_analysis_id,
-    params.normal_aln_analysis_id
+    params.normal_aln_analysis_id,
+    params.tumour_aln_metadata,
+    params.tumour_aln_cram,
+    params.tumour_extra_info,
+    params.normal_aln_metadata,
+    params.normal_aln_cram,
+    params.normal_extra_info,
   )
 }
