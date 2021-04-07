@@ -2,7 +2,7 @@
 nextflow.enable.dsl = 2
 name = 'sanger-wxs-variant-calling'
 short_name = 'sanger-wxs'
-version = '3.1.6-3.2.1'
+version = '3.1.6-3.3.0'
 
 
 /*
