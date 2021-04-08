@@ -2,6 +2,8 @@
   "study_id": "TEST-PR",
   "tumour_aln_analysis_id": "03905962-f1e1-41e8-9059-62f1e1c1e8fc",
   "normal_aln_analysis_id": "9940db0f-c100-496a-80db-0fc100d96ac1",
+  "max_retries": 3,
+  "first_retry_wait_time": 5,
   "cleanup": false,
   "song_url": "https://song.rdpc-qa.cancercollaboratory.org",
   "score_url": "https://score.rdpc-qa.cancercollaboratory.org",
