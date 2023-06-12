@@ -241,7 +241,7 @@ upload_params = [
 
 
 // Include all modules and pass params
-include { SongScoreDownload as dnldT; SongScoreDownload as dnldN } from './wfpr_modules/github.com/icgc-argo/nextflow-data-processing-utility-tools/song-score-download@2.9.0/main.nf' params(download_params)
+include { SongScoreDownload as dnldT; SongScoreDownload as dnldN } from './wfpr_modules/github.com/icgc-argo-workflows/nextflow-data-processing-utility-tools/song-score-download@2.9.0/main.nf' params(download_params)
 include { generateBas as basT; generateBas as basN; } from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/generate-bas.0.2.1.0/tools/generate-bas/generate-bas' params(generateBas_params)
 include { sangerWxsVariantCaller as sangerWxs } from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/sanger-wxs-variant-caller.3.1.6-3/tools/sanger-wxs-variant-caller/sanger-wxs-variant-caller.nf' params(sangerWxsVariantCaller_params)
 include { repackSangerResults as repack } from './modules/raw.githubusercontent.com/icgc-argo/variant-calling-tools/repack-sanger-results.0.2.0.0/tools/repack-sanger-results/repack-sanger-results' params(repackSangerResults_params)
